@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+	<title>Hello world!</title>
+	<style type="text/css">
+        .loader {
+		  border: 16px solid #f3f3f3; /* Light grey */
+		  border-top: 16px solid #3498db; /* Blue */
+		  border-radius: 50%;
+		  width: 50px;
+		  height: 50px;
+		  animation: spin 2s linear infinite;
+		}
+
+		@keyframes spin {
+		  0% { transform: rotate(0deg); }
+		  100% { transform: rotate(360deg); }
+		}
+    </style>
+
+
+	<script type='text/javascript'>
+		function save() {
+		
+			document.getElementById("saveMessage").style.visibility= "visible";
+			document.getElementById("buSave").disabled = true;
+
+            var message = {
+                amsAction: 'saveappconfig',
+                requestId: 'saveappconfig',
+                payload: {
+                    kalle: 'Anka'
+                }
+            };
+
+            this.handleMessageResponse = function (response) {
+                
+            };
+
+            window.parent.postMessage(message, '*');
+        }
+
+        function attachMessageListener() {
+            var messageHandlerFunction = this.handleMessage.bind(this);
+            window.addEventListener("message", messageHandlerFunction, false);
+        }
+ 
+ 
+        function handleMessage(event) {
+            if(event && event.data) {
+                console.log("Received Event From AMS", event);
+                
+                document.getElementById("saveMessage").style.visibility= "hidden";
+				document.getElementById("buSave").disabled = false;
+
+                var data = event.data;
+                if(data.requestId == this.amsAction || data.configurationStatus){
+                    this.receivedMessage = true;
+                    var response = this.parseResponse ? this.parseResponse(data) : data;
+                    this.handleMessageResponse(response);
+                }
+            }
+        }
+	</script>
+</head>
+
+<body onload="attachMessageListener()">
+	<h1>Hello World!</h1>
+	<p>from my <strong>App Config</strong></p>
+	
+	<button onClick='save()' id="buSave">Save</button>
+    <div id="saveMessage" style="visibility:hidden">
+        Saving
+  		<div class="loader"></div>
+    </div>
+
+</body>
+
+</html>
